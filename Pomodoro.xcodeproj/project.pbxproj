@@ -15,6 +15,9 @@
 		1E47E70726016D5C0098FE56 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E47E70526016D5C0098FE56 /* LaunchScreen.storyboard */; };
 		1E47E71226016D5C0098FE56 /* PomodoroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47E71126016D5C0098FE56 /* PomodoroTests.swift */; };
 		1E47E71D26016D5C0098FE56 /* PomodoroUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47E71C26016D5C0098FE56 /* PomodoroUITests.swift */; };
+		1E47E72E26016F430098FE56 /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47E72D26016F430098FE56 /* Timer.swift */; };
+		1E47E72F26016F430098FE56 /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47E72D26016F430098FE56 /* Timer.swift */; };
+		1E47E73026016F430098FE56 /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E47E72D26016F430098FE56 /* Timer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +52,7 @@
 		1E47E71826016D5C0098FE56 /* PomodoroUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PomodoroUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E47E71C26016D5C0098FE56 /* PomodoroUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroUITests.swift; sourceTree = "<group>"; };
 		1E47E71E26016D5C0098FE56 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1E47E72D26016F430098FE56 /* Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +110,7 @@
 				1E47E70326016D5C0098FE56 /* Assets.xcassets */,
 				1E47E70526016D5C0098FE56 /* LaunchScreen.storyboard */,
 				1E47E70826016D5C0098FE56 /* Info.plist */,
+				1E47E72D26016F430098FE56 /* Timer.swift */,
 			);
 			path = Pomodoro;
 			sourceTree = "<group>";
@@ -261,6 +266,7 @@
 				1E47E6FF26016D580098FE56 /* ViewController.swift in Sources */,
 				1E47E6FB26016D580098FE56 /* AppDelegate.swift in Sources */,
 				1E47E6FD26016D580098FE56 /* SceneDelegate.swift in Sources */,
+				1E47E72E26016F430098FE56 /* Timer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E47E71226016D5C0098FE56 /* PomodoroTests.swift in Sources */,
+				1E47E72F26016F430098FE56 /* Timer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +284,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E47E71D26016D5C0098FE56 /* PomodoroUITests.swift in Sources */,
+				1E47E73026016F430098FE56 /* Timer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
