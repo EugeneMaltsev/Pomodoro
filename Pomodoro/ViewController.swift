@@ -25,10 +25,9 @@ class ViewController: UIViewController {
     
     
     @IBAction func startButton(_ sender: UIButton) {
-        timer = Timer.scheduledTimer(timeInterval: 1,
-                                     target: self,
-                                     selector: #selector(countTimer),
-                                     userInfo: nil, repeats: true)
+    
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in self.countTimer() }
+        
         startButton.isHidden = true
         pauseButton.isHidden = false
         stopButton.isHidden = true
@@ -56,7 +55,7 @@ class ViewController: UIViewController {
         stopWatchAction.text = formatTime(time: count)
     }
     
-    @objc func countTimer() {
+    func countTimer() {
         
         if count > -1 {
             work = true
