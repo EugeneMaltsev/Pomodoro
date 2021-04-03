@@ -8,14 +8,11 @@
 import UIKit
 
 
-class ViewController: UIViewController {
-
-    var timer = Timer()
-    var timerBreak = Timer()
-    var count = 1500
-    var countBreak = 300
-
-    var work = false
+class ViewController: UIViewController, DataModelDelegate {
+    
+    func didRecieveDataUpdate(data: String) {
+        stopWatchAction.text = data
+    }
     
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
@@ -23,18 +20,22 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var stopWatchAction: UILabel!
     
+    var timer = PomodoroModel()
     
     @IBAction func startButton(_ sender: UIButton) {
-    
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in self.countTimer() }
         
+        timer.delegate = self
+        timer.startTimer()
+
         startButton.isHidden = true
         pauseButton.isHidden = false
         stopButton.isHidden = true
     }
     
     @IBAction func pauseButton(_ sender: UIButton) {
-        timer.invalidate()
+        
+        timer.pause()
+        
         startButton.isHidden = false
         pauseButton.isHidden = true
         stopButton.isHidden = false
@@ -42,53 +43,17 @@ class ViewController: UIViewController {
     
     
     @IBAction func stopButton(_ sender: UIButton) {
-        reset()
+
+        timer.reset()
+
         stopButton.isHidden = true
         startButton.isHidden = false
         pauseButton.isHidden = true
     }
 
-    func reset() {
-        timer.invalidate()
-        count = 1500
-        countBreak = 300
-        stopWatchAction.text = formatTime(time: count)
-    }
-    
-    func countTimer() {
-        
-        if count > -1 {
-            work = true
-            stopWatchAction.text = formatTime(time: count)
-            count -= 1
-        } else {
-            work = false
-        }
-        
-        if work == false {
-            if countBreak > -1 {
-                stopWatchAction.text = formatTime(time: countBreak)
-                countBreak -= 1
-            } else {
-                reset()
-                startButton(startButton)
-            }
-        }
-    }
-    
-    func formatTime(time: Int) -> String {
-        
-        let minutes = Int(time) / 60 % 60
-        let seconds = Int(time) % 60
-
-        return String(format: "%02i:%02i", minutes, seconds)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-    }
-    
-
+        
+        }
 }
 
