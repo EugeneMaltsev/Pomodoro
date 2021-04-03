@@ -24,13 +24,10 @@ class ViewController: UIViewController, DataModelDelegate {
     
     @IBAction func startButton(_ sender: UIButton) {
         
-        timer.delegate = self
-//        timer.startTimer(completion: <#T##((String) -> Void)##((String) -> Void)##(String) -> Void#>)
-        
         timer.startTimer { [weak self] (data: String) in
                     self?.useData(data: data)
               }
-        
+
         startButton.isHidden = true
         pauseButton.isHidden = false
         stopButton.isHidden = true

@@ -13,17 +13,16 @@ protocol DataModelDelegate: class {
 
 class PomodoroModel {
     
-    weak var delegate: DataModelDelegate?
     private var timer = Timer()
     private var timerBreak = Timer()
-    private var count = 1500
-    private var countBreak = 300
+    private var count = 5
+    private var countBreak = 3
     private var work = false
 // 1500 300
 
     func startTimer(completion: @escaping ((_ data: String) -> Void)) {
         
-//        let completion: (String) -> Void
+//       !!! let completion: (String) -> Void !!!
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
             
@@ -45,37 +44,14 @@ class PomodoroModel {
                 self.countBreak -= 1
             } else {
                 self.reset()
-                completion(nil)
-//                self.startTimer(completion: <#T##((String) -> Void)##((String) -> Void)##(String) -> Void#>)
+//                completion(nil) !!!
+//                self.startTimer(completion: <#T##((String) -> Void)##((String) -> Void)##(String) -> Void#>) !!!
             }
         }
         
     }
     }
-    
-//    func  countTimer(completion: @escaping (_ data: String) -> Void) {
-//
-//        if count > -1 {
-//            work = true
-////            delegate?.didRecieveDataUpdate(data: formatTime(time: count))
-//            completion(formatTime(time: count))
-//            count -= 1
-//        } else {
-//            work = false
-//        }
-//
-//        if work == false {
-//            if countBreak > -1 {
-//                delegate?.didRecieveDataUpdate(data: formatTime(time: countBreak))
-//                countBreak -= 1
-//            } else {
-//                reset()
-//                startTimer()
-//            }
-//        }
-//
-//    }
-    
+
     func formatTime(time: Int) -> String {
         
         let minutes = Int(time) / 60 % 60
