@@ -7,14 +7,9 @@
 
 import Foundation
 
-protocol DataModelDelegate: class {
-    func didRecieveDataUpdate(data: String)
-}
-
 class PomodoroModel {
     
     private var timer = Timer()
-    private var timerBreak = Timer()
     private var count = 5
     private var countBreak = 3
     private var work = false

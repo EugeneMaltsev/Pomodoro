@@ -8,11 +8,7 @@
 import UIKit
 
 
-class ViewController: UIViewController, DataModelDelegate {
-    
-    func didRecieveDataUpdate(data: String) {
-        stopWatchAction.text = data
-    }
+class ViewController: UIViewController {
     
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
