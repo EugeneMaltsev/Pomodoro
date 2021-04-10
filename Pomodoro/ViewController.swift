@@ -24,6 +24,7 @@ class ViewController: UIViewController {
                     self?.useData(data: data)
               }
 
+
         startButton.isHidden = true
         pauseButton.isHidden = false
         stopButton.isHidden = true
