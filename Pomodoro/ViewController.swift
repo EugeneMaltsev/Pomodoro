@@ -14,30 +14,32 @@ class ViewController: UIViewController {
     @IBOutlet weak var pauseButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
     
-    @IBOutlet weak var stopWatchAction: UILabel!
+    @IBOutlet weak var remainingTimeLabel: UILabel!
     
-    var timer = PomodoroModel()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
     
     @IBAction func startButton(_ sender: UIButton) {
+        guard model == nil else { return }
         
-        timer.startTimer { [weak self] (data: String) in
-                    self?.useData(data: data)
-              }
-
-
         startButton.isHidden = true
         pauseButton.isHidden = false
         stopButton.isHidden = true
-    }
-    
-    func useData(data: String) {
-        stopWatchAction.text = data
+        
+        model = .init()
+        model.workTimeHandler = { [weak self] elpsedTime in
+            self?.handleElapsedWorkTime(elpsedTime)
+        }
+        model.breakTimeHandler = { [weak self] elpsedTime in
+            self?.handleElapsedBreakTime(elpsedTime)
+        }
+        model.start()
     }
     
     
     @IBAction func pauseButton(_ sender: UIButton) {
-        
-        timer.pause()
+        // TODO: model.pause()
         
         startButton.isHidden = false
         pauseButton.isHidden = true
@@ -47,16 +49,29 @@ class ViewController: UIViewController {
     
     @IBAction func stopButton(_ sender: UIButton) {
 
-        timer.reset()
+        // TODO: model.reset()
 
         stopButton.isHidden = true
         startButton.isHidden = false
         pauseButton.isHidden = true
     }
+    
+    // MARK: Private
+    private var model: PomodoroModel!
+    
+    private func handleElapsedWorkTime(_ elapsedTime: PomodoroModel.TimeInterval) {
+        remainingTimeLabel.text = Self.formatTime(time: elapsedTime)
+    }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        }
+    private func handleElapsedBreakTime(_ elapsedTime: PomodoroModel.TimeInterval) {
+        remainingTimeLabel.text = Self.formatTime(time: elapsedTime)
+    }
+    
+    private class func formatTime(time: PomodoroModel.TimeInterval) -> String {
+
+        let minutes = Int(time) / 60 % 60
+        let seconds = Int(time) % 60
+
+        return String(format: "%02i:%02i", minutes, seconds)
+    }
 }
-

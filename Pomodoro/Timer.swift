@@ -7,61 +7,57 @@
 
 import Foundation
 
-class PomodoroModel {
+public class PomodoroModel {
     
-    private var timer = Timer()
-    private var count = 5
-    private var countBreak = 3
-    private var work = false
-// 1500 300
+    public typealias TimeInterval = UInt
+    public typealias TimeHandler = (TimeInterval) -> Void
+    
+    public var workTimeHandler: TimeHandler?
+    public var breakTimeHandler: TimeHandler?
+    
+    init(workTimeInterval: TimeInterval = 1500, breakTimeInterval: TimeInterval = 300) {
+        self.workTimeInterval = workTimeInterval
+        self.breakTimeInterval = breakTimeInterval
+    }
 
-    func startTimer(completion: @escaping ((_ data: String) -> Void)) {
-        
-//       !!! let completion: (String) -> Void !!!
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+    func start() {
+        assert(timer == nil)
+
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            guard self.timer == timer else { return }
             
-            if self.count > -1 {
-                self.work = true
-                
-                completion(self.formatTime(time: self.count))
-                
-                self.count -= 1
+            if self.work {
+                assert(self.workTimeInterval > 0)
+                self.workTimeInterval -= 1
+                self.workTimeHandler?(self.workTimeInterval)
+                if self.workTimeInterval == 0 {
+                    self.work = false
+                }
             } else {
-            self.work = false
-            }
-        
-            if self.work == false {
-                if self.countBreak > -1 {
-
-                    completion(self.formatTime(time: self.countBreak))
-                    
-                self.countBreak -= 1
-            } else {
-                self.reset()
-//                completion(nil) !!!
-//                self.startTimer(completion: <#T##((String) -> Void)##((String) -> Void)##(String) -> Void#>) !!!
+                assert(self.breakTimeInterval > 0)
+                self.breakTimeInterval -= 1
+                self.breakTimeHandler?(self.breakTimeInterval)
+                if self.breakTimeInterval == 0 {
+                    timer.invalidate()
+                    self.timer = nil
+                }
             }
         }
-        
-    }
     }
 
-    func formatTime(time: Int) -> String {
-        
-        let minutes = Int(time) / 60 % 60
-        let seconds = Int(time) % 60
-
-        return String(format: "%02i:%02i", minutes, seconds)
-    }
+    private var timer: Timer?
+    private var workTimeInterval: TimeInterval
+    private var breakTimeInterval: TimeInterval
+    private var work = true
     
-    func reset() {
-        timer.invalidate()
-        count = 5
-        countBreak = 3
-    }
-    
-    func pause() {
-        timer.invalidate()
-    }
+//    func reset() {
+//        timer.invalidate()
+//        count = 5
+//        countBreak = 3
+//    }
+//
+//    func pause() {
+//        timer.invalidate()
+//    }
 }
