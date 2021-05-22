@@ -8,89 +8,98 @@
 import UIKit
 
 
-class ViewController: UIViewController, PomodoroDelegate {
-    
-    func restTime(data: UInt) {
-        return
-    }
-    
-    func workTime(data: UInt) {
-        return
-    }
-    
-    func breakTime(data: UInt) {
-        return 
-    }
-    
-    
+class ViewController: UIViewController, PomodoroModelDelegate {
+
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
+    @IBOutlet weak var continueButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
     
     @IBOutlet weak var remainingTimeLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.model = PomodoroModel()
+        self.model.delegate = self
     }
  
-    @IBAction func startButton(_ sender: UIButton) {
-        guard model == nil else { return }
-        
-        startButton.isHidden = true
-        pauseButton.isHidden = false
-        stopButton.isHidden = true
-        
-        model = .init()
-        model.workTimeHandler = { [weak self] elpsedTime in
-            self?.handleElapsedWorkTime(elpsedTime)
-        }
-        model.breakTimeHandler = { [weak self] elpsedTime in
-            self?.handleElapsedBreakTime(elpsedTime)
-        }
-        model.restTimeHandler = { [weak self] elpsedTime in
-            self?.handleElapsedBreakTime(elpsedTime)
-        }
+    @IBAction func onStartButton(_ sender: UIButton) {
         model.start()
     }
     
+    @IBAction func onPauseButton(_ sender: UIButton) {
+        model.suspend()
+    }
     
-    @IBAction func pauseButton(_ sender: UIButton) {
-        // TODO: model.pause()
-        model.pause()
-        startButton.isHidden = false
+    @IBAction func onContinueButton(_ sender: UIButton) {
+        model.resume()
+    }
+    
+    @IBAction func onStopButton(_ sender: UIButton) {
+        model.stop()
+    }
+    
+    // MARK: PomodoroModelDelegate
+    func didStartWork(sliceNumber: UInt, remaningSeconds: UInt) {
+        updateRemainingTimeLabel(count: remaningSeconds, textColor: UIColor.red)
+        didResumeWork()
+    }
+    
+    func continueWork(remaningSeconds: UInt) {
+        updateRemainingTimeLabel(count: remaningSeconds)
+    }
+    
+    func didStartBreak(remaningSeconds: UInt) {
+        updateRemainingTimeLabel(count: remaningSeconds, textColor: UIColor.green)
+    }
+    
+    func continueBreak(remaningSeconds: UInt) {
+        updateRemainingTimeLabel(count: remaningSeconds)
+    }
+    
+    func didStartRest(remaningSeconds: UInt) {
+        updateRemainingTimeLabel(count: remaningSeconds, textColor: UIColor.yellow)
+    }
+    
+    func continueRest(remaningSeconds: UInt) {
+        updateRemainingTimeLabel(count: remaningSeconds)
+    }
+    
+    func didSuspendWork() {
+        startButton.isHidden = true
         pauseButton.isHidden = true
+        continueButton.isHidden = false
         stopButton.isHidden = false
     }
     
-    
-    @IBAction func stopButton(_ sender: UIButton) {
-
-        // TODO: model.reset()
-        model.reset()
+    func didResumeWork() {
+        startButton.isHidden = true
+        pauseButton.isHidden = false
+        continueButton.isHidden = true
         stopButton.isHidden = true
+    }
+    
+    func didStopWorks() {
         startButton.isHidden = false
         pauseButton.isHidden = true
+        continueButton.isHidden = true
+        stopButton.isHidden = true
     }
     
     // MARK: Private
     private var model: PomodoroModel!
     
-    private func handleElapsedWorkTime(_ elapsedTime: PomodoroModel.TimeInterval) {
-        remainingTimeLabel.text = Self.formatTime(time: elapsedTime)
+    private func updateRemainingTimeLabel(count: UInt, textColor: UIColor? = nil) {
+        self.remainingTimeLabel.text = Self.formatTime(count)
+        if let textColor = textColor {
+            self.remainingTimeLabel.textColor = textColor
+        }
     }
 
-    private func handleElapsedBreakTime(_ elapsedTime: PomodoroModel.TimeInterval) {
-        remainingTimeLabel.text = Self.formatTime(time: elapsedTime)
-    }
-    
-    private func handleElapsedRestTime(_ elapsedTime: PomodoroModel.TimeInterval) {
-        remainingTimeLabel.text = Self.formatTime(time: elapsedTime)
-    }
+    private class func formatTime(_ secondCount: UInt) -> String {
 
-    private class func formatTime(time: PomodoroModel.TimeInterval) -> String {
-
-        let minutes = Int(time) / 60 % 60
-        let seconds = Int(time) % 60
+        let minutes = Int(secondCount) / 60 % 60
+        let seconds = Int(secondCount) % 60
 
         return String(format: "%02i:%02i", minutes, seconds)
     }

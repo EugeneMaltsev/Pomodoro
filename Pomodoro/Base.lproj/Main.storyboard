@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -12,7 +13,7 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Pomodoro" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dbd-VQ-SZx" userLabel="pauseButton">
@@ -20,6 +21,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="PAUSE"/>
                                 <connections>
+                                    <action selector="onPauseButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dkG-Ww-4Sv"/>
                                     <action selector="pauseButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kMS-8F-pMS"/>
                                 </connections>
                             </button>
@@ -28,11 +30,12 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="START"/>
                                 <connections>
+                                    <action selector="onStartButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="7kP-xw-f8c"/>
                                     <action selector="startButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9rM-ea-8wE"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="25:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b6x-vy-gda" userLabel="stopWatchAction">
-                                <rect key="frame" x="247" y="96.5" width="106" height="60"/>
+                                <rect key="frame" x="154" y="149" width="106" height="60"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="37"/>
                                 <nil key="textColor"/>
@@ -43,7 +46,16 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="STOP"/>
                                 <connections>
+                                    <action selector="onStopButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="wEi-pR-iZ8"/>
                                     <action selector="stopButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="FIk-5W-3rU"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PjC-QA-Iwt">
+                                <rect key="frame" x="206" y="707" width="62" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Continue"/>
+                                <connections>
+                                    <action selector="onContinueButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="qFy-ny-gcr"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -51,6 +63,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
+                        <outlet property="continueButton" destination="PjC-QA-Iwt" id="mRX-0Z-LfN"/>
                         <outlet property="pauseButton" destination="Dbd-VQ-SZx" id="eku-Oz-y5e"/>
                         <outlet property="remainingTimeLabel" destination="b6x-vy-gda" id="B1Q-LA-EWa"/>
                         <outlet property="startButton" destination="9Cu-7r-dHB" id="YHY-d1-JiJ"/>
@@ -59,7 +72,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-405.14018691588785" y="-537.79697624190067"/>
+            <point key="canvasLocation" x="-405.79710144927537" y="-538.39285714285711"/>
         </scene>
     </scenes>
     <resources>
