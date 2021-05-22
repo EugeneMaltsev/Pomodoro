@@ -8,7 +8,20 @@
 import UIKit
 
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, PomodoroDelegate {
+    
+    func restTime(data: UInt) {
+        return
+    }
+    
+    func workTime(data: UInt) {
+        return
+    }
+    
+    func breakTime(data: UInt) {
+        return 
+    }
+    
     
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
@@ -19,7 +32,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-    
+ 
     @IBAction func startButton(_ sender: UIButton) {
         guard model == nil else { return }
         
@@ -34,13 +47,16 @@ class ViewController: UIViewController {
         model.breakTimeHandler = { [weak self] elpsedTime in
             self?.handleElapsedBreakTime(elpsedTime)
         }
+        model.restTimeHandler = { [weak self] elpsedTime in
+            self?.handleElapsedBreakTime(elpsedTime)
+        }
         model.start()
     }
     
     
     @IBAction func pauseButton(_ sender: UIButton) {
         // TODO: model.pause()
-        
+        model.pause()
         startButton.isHidden = false
         pauseButton.isHidden = true
         stopButton.isHidden = false
@@ -50,7 +66,7 @@ class ViewController: UIViewController {
     @IBAction func stopButton(_ sender: UIButton) {
 
         // TODO: model.reset()
-
+        model.reset()
         stopButton.isHidden = true
         startButton.isHidden = false
         pauseButton.isHidden = true
@@ -67,6 +83,10 @@ class ViewController: UIViewController {
         remainingTimeLabel.text = Self.formatTime(time: elapsedTime)
     }
     
+    private func handleElapsedRestTime(_ elapsedTime: PomodoroModel.TimeInterval) {
+        remainingTimeLabel.text = Self.formatTime(time: elapsedTime)
+    }
+
     private class func formatTime(time: PomodoroModel.TimeInterval) -> String {
 
         let minutes = Int(time) / 60 % 60
