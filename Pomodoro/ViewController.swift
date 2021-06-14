@@ -7,20 +7,25 @@
 
 import UIKit
 
-
 class ViewController: UIViewController, PomodoroModelDelegate {
-
+    
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
     @IBOutlet weak var continueButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
+    @IBOutlet weak var numberOfCyclesLabel: UILabel!
     
     @IBOutlet weak var remainingTimeLabel: UILabel!
     
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         self.model = PomodoroModel()
         self.model.delegate = self
+        self.remainingTimeLabel.text = ViewController.formatTime(self.model.workTimeInterval)
     }
  
     @IBAction func onStartButton(_ sender: UIButton) {
@@ -42,6 +47,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     // MARK: PomodoroModelDelegate
     func didStartWork(sliceNumber: UInt, remaningSeconds: UInt) {
         updateRemainingTimeLabel(count: remaningSeconds, textColor: UIColor.red)
+        updateNumberOfCyclesLabel(slices: sliceNumber)
         didResumeWork()
     }
     
@@ -76,18 +82,23 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         startButton.isHidden = true
         pauseButton.isHidden = false
         continueButton.isHidden = true
-        stopButton.isHidden = true
+        stopButton.isHidden = false
     }
     
-    func didStopWorks() {
+    func didStopWork() {
         startButton.isHidden = false
         pauseButton.isHidden = true
         continueButton.isHidden = true
         stopButton.isHidden = true
+        self.remainingTimeLabel.text = ViewController.formatTime(self.model.workTimeInterval)
     }
     
     // MARK: Private
     private var model: PomodoroModel!
+    
+    private func updateNumberOfCyclesLabel(slices: UInt) {
+        self.numberOfCyclesLabel.text = String(slices)
+    }
     
     private func updateRemainingTimeLabel(count: UInt, textColor: UIColor? = nil) {
         self.remainingTimeLabel.text = Self.formatTime(count)

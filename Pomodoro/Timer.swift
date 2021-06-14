@@ -16,7 +16,7 @@ public protocol PomodoroModelDelegate: class {
     func continueRest(remaningSeconds: UInt)
     func didSuspendWork()
     func didResumeWork()
-    func didStopWorks()
+    func didStopWork()
 }
 
 public class PomodoroModel {
@@ -30,9 +30,9 @@ public class PomodoroModel {
     let restTimeInterval: TimeInterval
     let numberOfCycles: TimeInterval
 
-    init(workTimeInterval: TimeInterval = 3,
-         breakTimeInterval: TimeInterval = 2,
-         restTimeInterval: TimeInterval = 15,
+    init(workTimeInterval: TimeInterval = 1500,
+         breakTimeInterval: TimeInterval = 300,
+         restTimeInterval: TimeInterval = 700,
          numberOfCycles: TimeInterval = 4) {
         self.workTimeInterval = workTimeInterval
         self.breakTimeInterval = breakTimeInterval
@@ -60,6 +60,7 @@ public class PomodoroModel {
     
     // MARK: Private
     private var state: BaseState
+    private var timer: Timer?
 }
 
 private extension PomodoroModel {
@@ -74,13 +75,41 @@ private extension PomodoroModel {
 
 private extension PomodoroModel {
     
+    class Timer {
+        
+        var fireBlock: (() -> Void)?
+        
+        deinit {
+            self.underlyingTimer?.invalidate()
+        }
+        
+        func suspend() {
+            assert(self.underlyingTimer != nil)
+            self.underlyingTimer?.invalidate()
+            self.underlyingTimer = nil
+        }
+        
+        func resume() {
+            assert(self.underlyingTimer == nil)
+            self.underlyingTimer = UnderlyingTimer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                self?.fireBlock?()
+            }
+        }
+        
+        private typealias UnderlyingTimer = Foundation.Timer
+        private var underlyingTimer: UnderlyingTimer?
+    }
+}
+
+private extension PomodoroModel {
+    
     class BaseState {
         
         weak var model: PomodoroModel?
         
         func didEnter() {
         }
-                
+        
         func start() {
             unexpectedCall()
         }
@@ -117,24 +146,92 @@ private extension PomodoroModel {
     
     class StateActive: BaseState {
         
+        let timer = Timer()
+        
         override func didEnter() {
-            assertionFailure("Not implemented")
+            assert(self.substate == .working)
+            guard let model = self.model else { return }
+            self.remaningSeconds = model.workTimeInterval
+            self.remaningCycles = model.numberOfCycles
+            self.timer.fireBlock = { [weak self] in
+                self?.timerDidFire()
+            }
+            self.timer.resume()
+            model.delegate?.didStartWork(sliceNumber: self.howMuchCycles, remaningSeconds: self.remaningSeconds)
         }
         
         override func stop() {
-            
+            guard let model = self.model else { return }
+            model.switchState(StateNeutral())
+            model.delegate?.didStopWork()
         }
         
         override func suspend() {
-            
+            self.model?.switchState(StateSuspended(activeState: self))
         }
         
-        func suspendTimer() {
-            
+        private enum Substate {
+            case working
+            case interrupt
+            case rest
         }
         
-        func resumeTimer() {
-            
+        private var substate = Substate.working
+        private var remaningSeconds = UInt(0)
+        private var remaningCycles = UInt(0)
+        private var howMuchCycles = UInt(0)
+
+        private func timerDidFire() {
+            assert(self.remaningSeconds > 0)
+            self.remaningSeconds -= 1
+            if self.remaningSeconds > 0 {
+                self.continueSubstate()
+            } else {
+                self.switchToNextSubstate()
+            }
+        }
+        
+        private func continueSubstate() {
+            assert(self.remaningSeconds > 0)
+            switch self.substate {
+            case .working:
+                self.model?.delegate?.continueWork(remaningSeconds: self.remaningSeconds)
+            case .interrupt:
+                self.model?.delegate?.continueBreak(remaningSeconds: self.remaningSeconds)
+            case .rest:
+                self.model?.delegate?.continueRest(remaningSeconds: self.remaningSeconds)
+            }
+        }
+ 
+        private func switchToNextSubstate() {
+            assert(self.remaningSeconds == 0)
+            guard let model = self.model else { return }
+            switch self.substate {
+            case .working:
+                assert(self.remaningCycles > 0)
+                self.remaningCycles -= 1
+                self.howMuchCycles += 1
+                if self.remaningCycles > 0 {
+                    self.remaningSeconds = model.breakTimeInterval
+                    self.substate = .interrupt
+                    model.delegate?.didStartBreak(remaningSeconds: self.remaningSeconds)
+                } else {
+                    self.remaningSeconds = model.restTimeInterval
+                    self.substate = .rest
+                    model.delegate?.didStartWork(sliceNumber: self.howMuchCycles, remaningSeconds: self.remaningSeconds)
+
+                    model.delegate?.didStartRest(remaningSeconds: self.remaningSeconds)
+                }
+            case .interrupt:
+                self.remaningSeconds = model.workTimeInterval
+                self.substate = .working
+                model.delegate?.didStartWork(sliceNumber: self.howMuchCycles, remaningSeconds: self.remaningSeconds)
+            case .rest:
+                self.remaningSeconds = model.workTimeInterval
+                self.remaningCycles = model.numberOfCycles
+                self.substate = .working
+                model.delegate?.didStartWork(sliceNumber: self.howMuchCycles, remaningSeconds: self.remaningSeconds)
+            }
         }
     }
 }
@@ -143,14 +240,15 @@ private extension PomodoroModel {
     
     class StateSuspended: BaseState {
         
-        var activeState: StateActive
+        let activeState: StateActive
         
         init(activeState: StateActive) {
             self.activeState = activeState
         }
         
         override func didEnter() {
-            self.activeState.suspendTimer()
+            self.activeState.timer.suspend()
+            self.model?.delegate?.didSuspendWork()
         }
         
         override func stop() {
@@ -158,156 +256,10 @@ private extension PomodoroModel {
         }
         
         override func resume() {
-            self.model?.state = self.activeState
-            self.activeState.resumeTimer()
+            guard let model = self.model else { return }
+            model.state = self.activeState
+            model.delegate?.didResumeWork()
+            self.activeState.timer.resume()
         }
     }
 }
-
-/*
-public class PomodoroModel {
-    
-    public typealias TimeInterval = UInt
-    public typealias TimeHandler = (TimeInterval) -> Void
-    
-    weak var delegate: PomodoroDelegate?
-    
-    public var workTimeHandler: TimeHandler?
-    public var breakTimeHandler: TimeHandler?
-    public var restTimeHandler: TimeHandler?
-    public var tomatoSlice: UInt = 0
-    
-    init(workTimeInterval: TimeInterval = 3,
-         breakTimeInterval: TimeInterval = 2,
-         restTimeInterval: TimeInterval = 15,
-         numberOfCycles: TimeInterval = 4) {
-        
-        
-        self.workTimeInterval = workTimeInterval
-        self.breakTimeInterval = breakTimeInterval
-        self.restTimeInterval = restTimeInterval
-        self.numberOfPomodoroCycles = numberOfCycles
-    }
-    
-    func start() {
-        assert(timer == nil)
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            guard let self = self else { return }
-            guard self.timer == timer else { return }
-            
-            assert(self.workTimeInterval > 0)
-            self.workTimeInterval -= 1
-            self.workTimeHandler?(self.workTimeInterval)
-//            self.delegate?.workTime(data: self.workTimeInterval)
-            if self.workTimeInterval == 0 {
-                timer.invalidate()
-                self.timer = nil
-                self.workTimeInterval = 3
-                self.breakStart()
-            }
-        }
-    }
-    
-    private func breakStart() {
-        assert(timer == nil)
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            guard let self = self else { return }
-            guard self.timer == timer else { return }
-            
-            assert(self.breakTimeInterval > 0)
-            self.breakTimeInterval -= 1
-            self.breakTimeHandler?(self.breakTimeInterval)
-//            self.delegate?.breakTime(data: self.breakTimeInterval)
-            if self.breakTimeInterval == 0 {
-                self.numberOfPomodoroCycles -= 1
-                self.tomatoSlice += 1
-                if self.numberOfPomodoroCycles == 0{
-                    self.resetTimer()
-                    self.breakTimeInterval = 2
-                    self.startRest()
-                } else {
-                    self.resetTimer()
-                    self.breakTimeInterval = 2
-                    self.start()
-                }
-            }
-        }
-    }
-    
-    private func startRest() {
-        assert(timer == nil)
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            guard let self = self else { return }
-            guard self.timer == timer else { return }
-            
-            
-            assert(self.restTimeInterval > 0)
-            self.restTimeInterval -= 1
-            self.restTimeHandler?(self.restTimeInterval)
-//            self.delegate?.restTime(data: self.restTimeInterval)
-            if self.restTimeInterval == 0 {
-                self.resetTimer()
-                self.restTimeInterval = 15
-                self.numberOfPomodoroCycles = 4
-                self.start()
-            }
-        }
-    }
-    
-    private func resetTimer() {
-        self.timer?.invalidate()
-        self.timer = nil
-    }
-    
-    private var timer: Timer?
-    private var workTimeInterval: TimeInterval
-    private var breakTimeInterval: TimeInterval
-    private var restTimeInterval: TimeInterval
-    private var numberOfPomodoroCycles: TimeInterval
-//
-//    func start() {
-//        assert(timer == nil)
-//
-//        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-//            guard let self = self else { return }
-//            guard self.timer == timer else { return }
-//
-//            if self.work {
-//                assert(self.workTimeInterval > 0)
-//                self.workTimeInterval -= 1
-//                self.workTimeHandler?(self.workTimeInterval)
-//                if self.workTimeInterval == 0 {
-//                    self.work = false
-//                }
-//            } else {
-//                assert(self.breakTimeInterval > 0)
-//                self.breakTimeInterval -= 1
-//                self.breakTimeHandler?(self.breakTimeInterval)
-//                if self.breakTimeInterval == 0 {
-//                    timer.invalidate()
-//                    self.timer = nil
-//                }
-//            }
-//        }
-//    }
-    
-
-    
-    
-//    func reset() {
-//        timer?.invalidate()
-//        self.timer = nil
-//        self.workTimeInterval = 3
-//        self.breakTimeInterval = 2
-//        self.restTimeInterval = 15
-//
-//    }
-//
-//    func pause() {
-//        timer?.invalidate()
-//    }
-}
-*/
