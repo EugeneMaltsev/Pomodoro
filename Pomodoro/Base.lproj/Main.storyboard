@@ -62,12 +62,87 @@
                                     <action selector="onPauseButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dkG-Ww-4Sv"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r6i-7U-q3D">
+                                <rect key="frame" x="72" y="490" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="changeWorkTimeButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VHG-UO-vkz"/>
+                                </connections>
+                            </button>
+                            <datePicker hidden="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="countDownTimer" minuteInterval="1" useCurrentDate="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eBG-Hn-rNl">
+                                <rect key="frame" x="0.0" y="268" width="375" height="162"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            </datePicker>
+                            <toolbar hidden="YES" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EP6-AR-C7S">
+                                <rect key="frame" x="1" y="224" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem title="Item" id="Hwj-NO-FEx"/>
+                                </items>
+                            </toolbar>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZPF-jn-Jok">
+                                <rect key="frame" x="290" y="490" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="changeBreakTimeButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="MyL-fr-wmn"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8OO-C9-xpe">
+                                <rect key="frame" x="72" y="386" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="changeRestTimeButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Yiu-ES-wcf"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L3y-oq-2JL">
+                                <rect key="frame" x="290" y="386" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="changeNumberoOfCyclesButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mQF-IP-sUc"/>
+                                </connections>
+                            </button>
+                            <datePicker hidden="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="countDownTimer" minuteInterval="1" useCurrentDate="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Wi-BU-ydQ">
+                                <rect key="frame" x="1" y="268" width="375" height="162"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            </datePicker>
+                            <toolbar hidden="YES" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lYf-q1-GNd">
+                                <rect key="frame" x="1" y="224" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem title="Item" id="LBR-jO-mwU"/>
+                                </items>
+                            </toolbar>
+                            <datePicker hidden="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="countDownTimer" minuteInterval="1" useCurrentDate="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uhe-hP-hgZ">
+                                <rect key="frame" x="0.0" y="268" width="375" height="162"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            </datePicker>
+                            <toolbar hidden="YES" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GbB-rk-qFH">
+                                <rect key="frame" x="1" y="224" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem title="Item" id="efQ-vY-itl"/>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
+                        <outlet property="changeBreakTimeButtonOutlet" destination="ZPF-jn-Jok" id="oXn-ge-6b0"/>
+                        <outlet property="changeNumberOfCyclesButtonOutlet" destination="L3y-oq-2JL" id="ocO-Wo-uf6"/>
+                        <outlet property="changeRestTimeButtonOutlet" destination="8OO-C9-xpe" id="EHA-Od-C8J"/>
+                        <outlet property="changeWorkTimeButtonOutlet" destination="r6i-7U-q3D" id="yHE-Al-tXS"/>
                         <outlet property="continueButton" destination="PjC-QA-Iwt" id="mRX-0Z-LfN"/>
+                        <outlet property="countDownBreakPicker" destination="8Wi-BU-ydQ" id="O4R-jR-aRT"/>
+                        <outlet property="countDownBreakPickerToolbar" destination="lYf-q1-GNd" id="rgL-jl-kxp"/>
+                        <outlet property="countDownRestPicker" destination="Uhe-hP-hgZ" id="H4Q-ov-Vdq"/>
+                        <outlet property="countDownRestPickerToolbar" destination="GbB-rk-qFH" id="axy-cY-D2Z"/>
+                        <outlet property="countDownWorkPicker" destination="eBG-Hn-rNl" id="4qH-5X-5m4"/>
+                        <outlet property="countDownWorkPickerToolbar" destination="EP6-AR-C7S" id="7gK-xa-4BC"/>
                         <outlet property="numberOfCyclesLabel" destination="bee-7E-uHr" id="xJz-3L-T6D"/>
                         <outlet property="pauseButton" destination="Dbd-VQ-SZx" id="eku-Oz-y5e"/>
                         <outlet property="remainingTimeLabel" destination="b6x-vy-gda" id="B1Q-LA-EWa"/>
