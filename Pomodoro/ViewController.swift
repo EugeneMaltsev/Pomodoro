@@ -34,32 +34,26 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     @IBAction func changeNumberoOfCyclesButton(_ sender: UIButton) {
     }
 
-    
-    @IBAction func changeRestTimeButton(_ sender: UIButton) {
-        if countDownRestPicker.isHidden {
-            countDownRestPicker.isHidden = false
+    @IBAction func changeWorkTimeButton(_ sender: UIButton) {
+        if countDownWorkPicker.isHidden {
+            countDownWorkPicker.isHidden = false
         }
-        if countDownRestPickerToolbar.isHidden {
-            countDownRestPickerToolbar.isHidden = false
+        if countDownWorkPickerToolbar.isHidden {
+            countDownWorkPickerToolbar.isHidden = false
         }
-        
-        changeWorkTimeButtonOutlet.isEnabled = false
+        changeRestTimeButtonOutlet.isEnabled = false
         changeBreakTimeButtonOutlet.isEnabled = false
         
-        countDownRestPicker.datePickerMode = .countDownTimer
-        countDownRestPicker.center = view.center
-
+        countDownWorkPicker.datePickerMode = .countDownTimer
+        countDownWorkPicker.center = view.center
         let space = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-        let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissRestPicker))
-        countDownRestPickerToolbar.setItems([space, doneButton], animated: false)
-        
+        let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissWorkPicker))
+        countDownWorkPickerToolbar.setItems([space, doneButton], animated: false)
+        countDownWorkPicker.countDownDuration = TimeInterval(self.model.workTimeInterval)
         self.model.workTimeInterval = PomodoroModel.TimeInterval(countDownWorkPicker.countDownDuration)
-
-        changeRestTimeButtonOutlet.setTitle("\(Self.formatTime(UInt(countDownRestPicker.countDownDuration)))", for: .normal)
-        
-        countDownRestPicker.addTarget(self, action: #selector(changeRestProperty), for: .valueChanged )
+        changeWorkTimeButtonOutlet.setTitle("\(Self.formatTimeButton(UInt(countDownWorkPicker.countDownDuration)))", for: .normal)
+        countDownWorkPicker.addTarget(self, action: #selector(changeWorkProperty), for: .valueChanged )
     }
-    
     
     @IBAction func changeBreakTimeButton(_ sender: UIButton) {
         if countDownBreakPicker.isHidden {
@@ -71,59 +65,51 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         changeWorkTimeButtonOutlet.isEnabled = false
         changeRestTimeButtonOutlet.isEnabled = false
 
-        
         countDownBreakPicker.datePickerMode = .countDownTimer
         countDownBreakPicker.center = view.center
-
         let space = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissBreakPicker))
         countDownBreakPickerToolbar.setItems([space, doneButton], animated: false)
-        
-        self.model.workTimeInterval = PomodoroModel.TimeInterval(countDownWorkPicker.countDownDuration)
-
-        changeBreakTimeButtonOutlet.setTitle("\(Self.formatTime(UInt(countDownBreakPicker.countDownDuration)))", for: .normal)
-        
+        countDownBreakPicker.countDownDuration = TimeInterval(self.model.breakTimeInterval)
+        self.model.breakTimeInterval = PomodoroModel.TimeInterval(countDownBreakPicker.countDownDuration)
+        changeBreakTimeButtonOutlet.setTitle("\(Self.formatTimeButton(UInt(countDownBreakPicker.countDownDuration)))", for: .normal)
         countDownBreakPicker.addTarget(self, action: #selector(changeBreakProperty), for: .valueChanged )
     }
     
-    @IBAction func changeWorkTimeButton(_ sender: UIButton) {
-        
-        if countDownWorkPicker.isHidden {
-            countDownWorkPicker.isHidden = false
+    @IBAction func changeRestTimeButton(_ sender: UIButton) {
+        if countDownRestPicker.isHidden {
+            countDownRestPicker.isHidden = false
         }
-        if countDownWorkPickerToolbar.isHidden {
-            countDownWorkPickerToolbar.isHidden = false
+        if countDownRestPickerToolbar.isHidden {
+            countDownRestPickerToolbar.isHidden = false
         }
-        changeRestTimeButtonOutlet.isEnabled = false
+        changeWorkTimeButtonOutlet.isEnabled = false
         changeBreakTimeButtonOutlet.isEnabled = false
 
-        countDownWorkPicker.datePickerMode = .countDownTimer
-        countDownWorkPicker.center = view.center
-
+        countDownRestPicker.datePickerMode = .countDownTimer
+        countDownRestPicker.center = view.center
         let space = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-        let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissWorkPicker))
-        countDownWorkPickerToolbar.setItems([space, doneButton], animated: false)
-        
-        self.model.workTimeInterval = PomodoroModel.TimeInterval(countDownWorkPicker.countDownDuration)
-
-        changeWorkTimeButtonOutlet.setTitle("\(Self.formatTime(UInt(countDownWorkPicker.countDownDuration)))", for: .normal)
-        
-        countDownWorkPicker.addTarget(self, action: #selector(changeWorkProperty), for: .valueChanged )
+        let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissRestPicker))
+        countDownRestPickerToolbar.setItems([space, doneButton], animated: false)
+        countDownRestPicker.countDownDuration = TimeInterval(self.model.restTimeInterval)
+        self.model.restTimeInterval = PomodoroModel.TimeInterval(countDownRestPicker.countDownDuration)
+        changeRestTimeButtonOutlet.setTitle("\(Self.formatTimeButton(UInt(countDownRestPicker.countDownDuration)))", for: .normal)
+        countDownRestPicker.addTarget(self, action: #selector(changeRestProperty), for: .valueChanged )
     }
     
     @objc public func changeWorkProperty() {
         self.model.workTimeInterval = PomodoroModel.TimeInterval(countDownWorkPicker.countDownDuration)
-        changeWorkTimeButtonOutlet.setTitle("\(Self.formatTime(UInt(countDownWorkPicker.countDownDuration)))", for: .normal)
+        changeWorkTimeButtonOutlet.setTitle("\(Self.formatTimeButton(UInt(countDownWorkPicker.countDownDuration)))", for: .normal)
     }
     
     @objc public func changeBreakProperty() {
         self.model.breakTimeInterval = PomodoroModel.TimeInterval(countDownBreakPicker.countDownDuration)
-        changeBreakTimeButtonOutlet.setTitle("\(Self.formatTime(UInt(countDownBreakPicker.countDownDuration)))", for: .normal)
+        changeBreakTimeButtonOutlet.setTitle("\(Self.formatTimeButton(UInt(countDownBreakPicker.countDownDuration)))", for: .normal)
     }
 
     @objc public func changeRestProperty() {
         self.model.restTimeInterval = PomodoroModel.TimeInterval(countDownRestPicker.countDownDuration)
-        changeRestTimeButtonOutlet.setTitle("\(Self.formatTime(UInt(countDownRestPicker.countDownDuration)))", for: .normal)
+        changeRestTimeButtonOutlet.setTitle("\(Self.formatTimeButton(UInt(countDownRestPicker.countDownDuration)))", for: .normal)
     }
 
 //    @objc public func changeWorkProperty() {
@@ -137,6 +123,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
 
         countDownWorkPicker.isHidden = true
         countDownWorkPickerToolbar.isHidden = true
+        updateRemainingTimeLabel(count: model.workTimeInterval)
     }
     @objc public func dismissBreakPicker() {
         changeWorkTimeButtonOutlet.isEnabled = true
@@ -144,6 +131,8 @@ class ViewController: UIViewController, PomodoroModelDelegate {
 
         countDownBreakPicker.isHidden = true
         countDownBreakPickerToolbar.isHidden = true
+//        updateRemainingTimeLabel(count: model.breakTimeInterval)
+
     }
 
     @objc public func dismissRestPicker() {
@@ -152,6 +141,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         
         countDownRestPicker.isHidden = true
         countDownRestPickerToolbar.isHidden = true
+//        updateRemainingTimeLabel(count: model.restTimeInterval)
     }
     
     override func viewDidLoad() {
@@ -160,9 +150,9 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         self.model = PomodoroModel()
         self.model.delegate = self
         self.remainingTimeLabel.text = ViewController.formatTime(self.model.workTimeInterval)
-//        self.changeWorkTimeButtonOutlet.setTitle("\(Self.formatTime(model.workTimeInterval))", for: .normal)
-//        self.changeRestTimeButtonOutlet.setTitle("\(Self.formatTime(model.restTimeInterval)))", for: .normal)
-//        self.changeBreakTimeButtonOutlet.setTitle("\(Self.formatTime(model.breakTimeInterval)))", for: .normal)
+        self.changeWorkTimeButtonOutlet.setTitle("\(Self.formatTimeButton(model.workTimeInterval))", for: .normal)
+        self.changeRestTimeButtonOutlet.setTitle("\(Self.formatTimeButton(model.restTimeInterval))", for: .normal)
+        self.changeBreakTimeButtonOutlet.setTitle("\(Self.formatTimeButton(model.breakTimeInterval))", for: .normal)
 
     }
     
@@ -252,4 +242,14 @@ class ViewController: UIViewController, PomodoroModelDelegate {
 
         return String(format: "%02i:%02i", minutes, seconds)
     }
+    private class func formatTimeButton(_ secondCount: UInt) -> String {
+
+        let minutes = Int(secondCount) / 60 % 60
+//        let seconds = Int(secondCount) % 60
+
+//        return String(format: "%02i", minutes, seconds)
+        return String(format: "%2i", minutes)
+
+    }
+
 }
