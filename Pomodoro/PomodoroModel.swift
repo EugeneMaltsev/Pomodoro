@@ -25,10 +25,10 @@ public class PomodoroModel {
     
     weak var delegate: PomodoroModelDelegate?
     
-    var workTimeInterval: TimeInterval
-    var breakTimeInterval: TimeInterval
-    var restTimeInterval: TimeInterval
-    var numberOfCycles: TimeInterval
+    let workTimeInterval: TimeInterval
+    let breakTimeInterval: TimeInterval
+    let restTimeInterval: TimeInterval
+    let numberOfCycles: TimeInterval
 
     init(workTimeInterval: TimeInterval = 1500,
          breakTimeInterval: TimeInterval = 300,
