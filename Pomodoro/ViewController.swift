@@ -6,21 +6,24 @@
 //
 
 import UIKit
+import PomodoroModel
 
 class ViewController: UIViewController, PomodoroModelDelegate {
-    
+// MARK: - Outlets
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
     @IBOutlet weak var continueButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
-    @IBOutlet weak var numberOfCyclesLabel: UILabel!
     
+    @IBOutlet weak var numberOfCyclesLabel: UILabel!
     @IBOutlet weak var remainingTimeLabel: UILabel!
     
     @IBOutlet weak var workTimeIntervalCustomizeButton: UIButton!
     @IBOutlet weak var breakTimeIntervalCustomizeButton: UIButton!
     @IBOutlet weak var restTimeIntervalCustomizeButton: UIButton!
     @IBOutlet weak var numberOfCyclesCustomizeButton: UIButton!
+
+// MARK: - Customize Pickers
     
     @IBOutlet weak var workTimeIntervalPicker: UIDatePicker!
     @IBOutlet weak var toolbarOfWorkTimeIntervalPicker: UIToolbar!
@@ -35,17 +38,20 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     
     @IBAction func changeNumberOfCyclesButton(_ sender: UIButton) {
     }
+
+// MARK: - View LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.model = PomodoroModel()
-        self.model.delegate = self
+        self.setupModel()
         self.remainingTimeLabel.text = ViewController.formatTimeForLabel(self.model.workTimeInterval)
         self.workTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(model.workTimeInterval))", for: .normal)
         self.restTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(model.restTimeInterval))", for: .normal)
         self.breakTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(model.breakTimeInterval))", for: .normal)
     }
+    
+// MARK: - Customize WorkTime
     
     @IBAction func setWorkTimeIntervalAction(_ sender: UIButton) {
         if workTimeIntervalPicker.isHidden {
@@ -59,14 +65,32 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         
         workTimeIntervalPicker.datePickerMode = .countDownTimer
         workTimeIntervalPicker.center = view.center
+        
         let space = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissWorkTimeIntervalPickerANDtoolbarOfWorkTimeIntervalPicker))
         toolbarOfWorkTimeIntervalPicker.setItems([space, doneButton], animated: false)
-        workTimeIntervalPicker.countDownDuration = TimeInterval(self.model.workTimeInterval)
-        self.model.workTimeInterval = PomodoroModel.TimeInterval(workTimeIntervalPicker.countDownDuration)
+        
+        workTimeIntervalPicker.countDownDuration = TimeInterval(self.workTimeInterval)
+        
+        self.workTimeInterval = PomodoroModel.TimeInterval(workTimeIntervalPicker.countDownDuration)
         workTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(workTimeIntervalPicker.countDownDuration)))", for: .normal)
         workTimeIntervalPicker.addTarget(self, action: #selector(workTimeIntervalPickerIsChanged), for: .valueChanged )
     }
+    
+    @objc public func workTimeIntervalPickerIsChanged() {
+        self.workTimeInterval = PomodoroModel.TimeInterval(workTimeIntervalPicker.countDownDuration)
+        workTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(workTimeIntervalPicker.countDownDuration)))", for: .normal)
+    }
+    @objc public func dismissWorkTimeIntervalPickerANDtoolbarOfWorkTimeIntervalPicker() {
+        restTimeIntervalCustomizeButton.isEnabled = true
+        breakTimeIntervalCustomizeButton.isEnabled = true
+
+        workTimeIntervalPicker.isHidden = true
+        toolbarOfWorkTimeIntervalPicker.isHidden = true
+        updateRemainingTimeLabel(count: self.workTimeInterval)
+    }
+    
+// MARK: - Customize BreakTime
     
     @IBAction func setBreakTimeIntervalAction(_ sender: UIButton) {
         if breakTimeIntervalPicker.isHidden {
@@ -80,14 +104,31 @@ class ViewController: UIViewController, PomodoroModelDelegate {
 
         breakTimeIntervalPicker.datePickerMode = .countDownTimer
         breakTimeIntervalPicker.center = view.center
+        
         let space = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissBreakTimeIntervalPickerANDtoolbarOfBreakTimeIntervalPicker))
         toolbarOfBreakTimeIntervalPicker.setItems([space, doneButton], animated: false)
-        breakTimeIntervalPicker.countDownDuration = TimeInterval(self.model.breakTimeInterval)
-        self.model.breakTimeInterval = PomodoroModel.TimeInterval(breakTimeIntervalPicker.countDownDuration)
+        
+        breakTimeIntervalPicker.countDownDuration = TimeInterval(self.breakTimeInterval)
+        self.breakTimeInterval = PomodoroModel.TimeInterval(breakTimeIntervalPicker.countDownDuration)
         breakTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(breakTimeIntervalPicker.countDownDuration)))", for: .normal)
         breakTimeIntervalPicker.addTarget(self, action: #selector(breakTimeIntervalPickerIsChanged), for: .valueChanged )
     }
+    
+    @objc public func breakTimeIntervalPickerIsChanged() {
+        self.breakTimeInterval = PomodoroModel.TimeInterval(breakTimeIntervalPicker.countDownDuration)
+        breakTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(breakTimeIntervalPicker.countDownDuration)))", for: .normal)
+    }
+
+    @objc public func dismissBreakTimeIntervalPickerANDtoolbarOfBreakTimeIntervalPicker() {
+        workTimeIntervalCustomizeButton.isEnabled = true
+        restTimeIntervalCustomizeButton.isEnabled = true
+
+        breakTimeIntervalPicker.isHidden = true
+        toolbarOfBreakTimeIntervalPicker.isHidden = true
+    }
+
+// MARK: - Customize RestTime
     
     @IBAction func setRestTimeIntervalAction(_ sender: UIButton) {
         if restTimeIntervalPicker.isHidden {
@@ -101,45 +142,22 @@ class ViewController: UIViewController, PomodoroModelDelegate {
 
         restTimeIntervalPicker.datePickerMode = .countDownTimer
         restTimeIntervalPicker.center = view.center
+        
         let space = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.dismissRestTimeIntervalPickerANDtoolbarOfRestTimeIntervalPicker))
         toolbarOfRestTimeIntervalPicker.setItems([space, doneButton], animated: false)
-        restTimeIntervalPicker.countDownDuration = TimeInterval(self.model.restTimeInterval)
-        self.model.restTimeInterval = PomodoroModel.TimeInterval(restTimeIntervalPicker.countDownDuration)
+        
+        restTimeIntervalPicker.countDownDuration = TimeInterval(self.restTimeInterval)
+        self.restTimeInterval = PomodoroModel.TimeInterval(restTimeIntervalPicker.countDownDuration)
         restTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(restTimeIntervalPicker.countDownDuration)))", for: .normal)
         restTimeIntervalPicker.addTarget(self, action: #selector(restTimeIntervalPickerIsChanged), for: .valueChanged )
     }
     
-    @objc public func workTimeIntervalPickerIsChanged() {
-        self.model.workTimeInterval = PomodoroModel.TimeInterval(workTimeIntervalPicker.countDownDuration)
-        workTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(workTimeIntervalPicker.countDownDuration)))", for: .normal)
-    }
-    
-    @objc public func breakTimeIntervalPickerIsChanged() {
-        self.model.breakTimeInterval = PomodoroModel.TimeInterval(breakTimeIntervalPicker.countDownDuration)
-        breakTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(breakTimeIntervalPicker.countDownDuration)))", for: .normal)
-    }
-
     @objc public func restTimeIntervalPickerIsChanged() {
-        self.model.restTimeInterval = PomodoroModel.TimeInterval(restTimeIntervalPicker.countDownDuration)
+        self.restTimeInterval = PomodoroModel.TimeInterval(restTimeIntervalPicker.countDownDuration)
         restTimeIntervalCustomizeButton.setTitle("\(Self.formatTimeForCustomizeButtons(UInt(restTimeIntervalPicker.countDownDuration)))", for: .normal)
     }
 
-    @objc public func dismissWorkTimeIntervalPickerANDtoolbarOfWorkTimeIntervalPicker() {
-        restTimeIntervalCustomizeButton.isEnabled = true
-        breakTimeIntervalCustomizeButton.isEnabled = true
-
-        workTimeIntervalPicker.isHidden = true
-        toolbarOfWorkTimeIntervalPicker.isHidden = true
-        updateRemainingTimeLabel(count: model.workTimeInterval)
-    }
-    @objc public func dismissBreakTimeIntervalPickerANDtoolbarOfBreakTimeIntervalPicker() {
-        workTimeIntervalCustomizeButton.isEnabled = true
-        restTimeIntervalCustomizeButton.isEnabled = true
-
-        breakTimeIntervalPicker.isHidden = true
-        toolbarOfBreakTimeIntervalPicker.isHidden = true
-    }
     @objc public func dismissRestTimeIntervalPickerANDtoolbarOfRestTimeIntervalPicker() {
         workTimeIntervalCustomizeButton.isEnabled = true
         breakTimeIntervalCustomizeButton.isEnabled = true
@@ -162,7 +180,10 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         numberOfCyclesCustomizeButton.isEnabled = true
     }
     
+// MARK: - Control Elements
+    
     @IBAction func onStartButton(_ sender: UIButton) {
+        setupModel()
         model.start()
         hideAllCustomizeButtons()
     }
@@ -182,7 +203,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         showAllCustomizeButtons()
     }
     
-    // MARK: PomodoroModelDelegate
+    // MARK: - PomodoroModelDelegate
     func didStartWork(partOfCompeletedCycle: UInt, remaningSeconds: UInt) {
         updateRemainingTimeLabel(count: remaningSeconds, textColor: UIColor.red)
         updateNumberOfCyclesLabel(cyclePart: partOfCompeletedCycle)
@@ -231,9 +252,18 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         self.remainingTimeLabel.text = ViewController.formatTimeForLabel(self.model.workTimeInterval)
     }
     
-    // MARK: Private
+    // MARK: - Private
     private var model: PomodoroModel!
+    private var workTimeInterval: PomodoroModel.TimeInterval = 1500
+    private var breakTimeInterval: PomodoroModel.TimeInterval = 700
+    private var restTimeInterval: PomodoroModel.TimeInterval = 300
+    private var numberOfCycles: PomodoroModel.TimeInterval = 4
     
+    private func setupModel() {
+        model = PomodoroModel(workTimeInterval: workTimeInterval, breakTimeInterval: breakTimeInterval, restTimeInterval: restTimeInterval, numberOfCycles: numberOfCycles)
+        model.delegate = self
+    }
+
     private func updateNumberOfCyclesLabel(cyclePart: UInt) {
         self.numberOfCyclesLabel.text = String(cyclePart)
     }
@@ -252,6 +282,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
 
         return String(format: "%02i:%02i", minutes, seconds)
     }
+    
     private class func formatTimeForCustomizeButtons(_ secondCount: UInt) -> String {
 
         let minutes = Int(secondCount) / 60 % 60

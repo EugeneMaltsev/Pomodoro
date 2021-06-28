@@ -23,14 +23,14 @@ public class PomodoroModel {
     
     public typealias TimeInterval = UInt
     
-    weak var delegate: PomodoroModelDelegate?
+    public weak var delegate: PomodoroModelDelegate?
     
-    let workTimeInterval: TimeInterval
-    let breakTimeInterval: TimeInterval
-    let restTimeInterval: TimeInterval
-    let numberOfCycles: TimeInterval
+    public let workTimeInterval: TimeInterval
+    public let breakTimeInterval: TimeInterval
+    public let restTimeInterval: TimeInterval
+    public let numberOfCycles: TimeInterval
 
-    init(workTimeInterval: TimeInterval = 1500,
+    public init(workTimeInterval: TimeInterval = 1500,
          breakTimeInterval: TimeInterval = 300,
          restTimeInterval: TimeInterval = 700,
          numberOfCycles: TimeInterval = 4) {
@@ -42,19 +42,19 @@ public class PomodoroModel {
         self.state.model = self
     }
     
-    func start() {
+    public func start() {
         state.start()
     }
     
-    func stop() {
+    public func stop() {
         state.stop()
     }
     
-    func suspend() {
+    public func suspend() {
         state.suspend()
     }
     
-    func resume() {
+    public func resume() {
         state.resume()
     }
     
