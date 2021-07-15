@@ -19,6 +19,8 @@ public protocol PomodoroModelDelegate: class {
     func didStopWork()
 }
 
+// MARK: -
+
 public class PomodoroModel {
     
     public typealias TimeInterval = UInt
@@ -63,6 +65,8 @@ public class PomodoroModel {
     private var timer: Timer?
 }
 
+// MARK: - SwitchState
+
 private extension PomodoroModel {
     
     func switchState(_ state: BaseState) {
@@ -72,6 +76,8 @@ private extension PomodoroModel {
         self.state.didEnter()
     }
 }
+
+// MARK: - Timer
 
 private extension PomodoroModel {
     
@@ -100,6 +106,8 @@ private extension PomodoroModel {
         private var underlyingTimer: UnderlyingTimer?
     }
 }
+
+// MARK: - BaseState
 
 private extension PomodoroModel {
     
@@ -141,6 +149,8 @@ private extension PomodoroModel {
         }
     }
 }
+
+// MARK: - StateActive
 
 private extension PomodoroModel {
     
@@ -235,6 +245,8 @@ private extension PomodoroModel {
         }
     }
 }
+
+// MARK: - StateSuspended
 
 private extension PomodoroModel {
     

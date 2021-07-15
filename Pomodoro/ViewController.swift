@@ -9,7 +9,7 @@ import UIKit
 import PomodoroModel
 
 class ViewController: UIViewController, PomodoroModelDelegate {
-// MARK: - Outlets
+// MARK: - ButtonOutlets
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
     @IBOutlet weak var continueButton: UIButton!
@@ -128,7 +128,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
         toolbarOfBreakTimeIntervalPicker.isHidden = true
     }
 
-// MARK: - Customize RestTime
+    // MARK: - Customize RestTime
     
     @IBAction func setRestTimeIntervalAction(_ sender: UIButton) {
         if restTimeIntervalPicker.isHidden {
@@ -190,7 +190,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     
     @IBAction func onPauseButton(_ sender: UIButton) {
         model.suspend()
-        showAllCustomizeButtons()
+        hideAllCustomizeButtons()
     }
     
     @IBAction func onContinueButton(_ sender: UIButton) {
