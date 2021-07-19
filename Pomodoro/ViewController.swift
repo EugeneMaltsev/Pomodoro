@@ -254,10 +254,10 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     
     // MARK: - Private
     private var model: PomodoroModel!
-    private var workTimeInterval: PomodoroModel.TimeInterval = 1500
-    private var breakTimeInterval: PomodoroModel.TimeInterval = 700
-    private var restTimeInterval: PomodoroModel.TimeInterval = 300
-    private var numberOfCycles: PomodoroModel.TimeInterval = 4
+    private var workTimeInterval: PomodoroModel.TimeInterval = 1 //1500
+    private var breakTimeInterval: PomodoroModel.TimeInterval = 1 // 700
+    private var restTimeInterval: PomodoroModel.TimeInterval = 1// 300
+    private var numberOfCycles: Int = 1 // 4
     
     private func setupModel() {
         model = PomodoroModel(workTimeInterval: workTimeInterval, breakTimeInterval: breakTimeInterval, restTimeInterval: restTimeInterval, numberOfCycles: numberOfCycles)

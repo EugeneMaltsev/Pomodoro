@@ -20,6 +20,8 @@ class PomodoroModelTests: XCTestCase {
     var modelContinuedBreak: XCTestExpectation?
     var modeldidStartedBreak: XCTestExpectation?
     var modeldidStartedRest: XCTestExpectation?
+    
+    var modelContinuedRestHandler: ((UInt) -> Void)?
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -75,24 +77,33 @@ class PomodoroModelTests: XCTestCase {
     }
     
     func testCompleteWay() {
-        let model = PomodoroModel(workTimeInterval: 2, breakTimeInterval: 2, restTimeInterval: 2, numberOfCycles: 2)
+        let model = PomodoroModel(workTimeInterval: 1, breakTimeInterval: 1, restTimeInterval: 1, numberOfCycles: 1)
         model.delegate = self
-        
-        self.modelContinuedWork = self.expectation(description: "continue work")
-        self.modelContinuedWork?.expectedFulfillmentCount = 1
-        self.modeldidStartedBreak = self.expectation(description: "break started")
-        self.modeldidStartedBreak?.expectedFulfillmentCount = 1
-        self.modelContinuedBreak = self.expectation(description: "break continue")
+        self.modelContinuedWork = self.expectation(description: "continueWork")
+        self.modelContinuedWork?.expectedFulfillmentCount = 2
+        self.modeldidStartedBreak = self.expectation(description: "didStartBreak")
+        self.modeldidStartedBreak?.expectedFulfillmentCount = 2
+        self.modelContinuedBreak = self.expectation(description: "continueBreak")
         self.modelContinuedBreak?.expectedFulfillmentCount = 1
-        self.modeldidStartedRest = self.expectation(description: "rest started")
+        self.modeldidStartedRest = self.expectation(description: "didStartRest")
         self.modeldidStartedRest?.expectedFulfillmentCount = 1
-        self.modelContinuedRest = self.expectation(description: "continue rest")
+        self.modelContinuedRest = self.expectation(description: "continueRest")
         self.modelContinuedRest?.expectedFulfillmentCount = 1
+        self.modelContinuedRestHandler? = { (remainingSeconds: UInt) in
+            if remainingSeconds == 1 {
+//                DispatchQueue.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    model.stop()
+                }
+            }
+        }
         model.start()
-        waitForExpectations(timeout: 0)
+//        Thread.sleep(forTimeInterval: 10)
+        waitForExpectations(timeout: 10)
+
     }
 }
-    
+
 // MARK: - PomodoroModelDelegate
 
 extension PomodoroModelTests: PomodoroModelDelegate {
@@ -119,6 +130,7 @@ extension PomodoroModelTests: PomodoroModelDelegate {
     
     func continueRest(remaningSeconds: UInt) {
         self.modelContinuedRest?.fulfill()
+//        modelContinuedRestHandler?(remaningSeconds)
     }
     
     func didSuspendWork() {
@@ -133,3 +145,4 @@ extension PomodoroModelTests: PomodoroModelDelegate {
         self.modelStopped?.fulfill()
     }
 }
+
