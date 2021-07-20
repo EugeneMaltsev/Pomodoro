@@ -192,9 +192,9 @@ private extension PomodoroModel {
         private var passedCycles = UInt(0)
 
         private func timerDidFire() {
-            assert(self.remaningSeconds >= 0)
+            assert(self.remaningSeconds > 0)
             self.remaningSeconds -= 1
-            if self.remaningSeconds >= 0 {
+            if self.remaningSeconds > 0 {
                 self.continueSubstate()
             } else {
                 self.switchToNextSubstate()
@@ -202,7 +202,7 @@ private extension PomodoroModel {
         }
         
         private func continueSubstate() {
-            assert(self.remaningSeconds >= 0)
+            assert(self.remaningSeconds > 0)
             switch self.substate {
             case .working:
                 self.model?.delegate?.continueWork(remaningSeconds: self.remaningSeconds)
@@ -218,10 +218,10 @@ private extension PomodoroModel {
             guard let model = self.model else { return }
             switch self.substate {
             case .working:
-                assert(self.remaningCycles > -1)
+                assert(self.remaningCycles >= 0)
                 self.remaningCycles -= 1
                 self.passedCycles += 1
-                if self.remaningCycles > -1 {
+                if self.remaningCycles >= 0 {
                     self.remaningSeconds = model.breakTimeInterval
                     self.substate = .interrupt
                     model.delegate?.didStartBreak(remaningSeconds: self.remaningSeconds)
