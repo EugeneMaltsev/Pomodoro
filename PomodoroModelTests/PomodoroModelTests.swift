@@ -6,7 +6,7 @@
 //
 
 import XCTest
-import PomodoroModel
+@testable import PomodoroModel
 
 class PomodoroModelTests: XCTestCase {
 
@@ -21,14 +21,15 @@ class PomodoroModelTests: XCTestCase {
     var modeldidStartedBreak: XCTestExpectation?
     var modeldidStartedRest: XCTestExpectation?
     
+    var modelContinuedWorkHandler: ((UInt) -> Void)?
     var modelContinuedRestHandler: ((UInt) -> Void)?
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        PomodoroModel.TimerTicksPerSecond = 1000
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        PomodoroModel.TimerTicksPerSecond = 1
     }
 
     func testDefaultCreation() throws {
@@ -77,28 +78,33 @@ class PomodoroModelTests: XCTestCase {
     }
     
     func testCompleteWay() {
-        let model = PomodoroModel(workTimeInterval: 2, breakTimeInterval: 2, restTimeInterval: 2, numberOfCycles: 1)
+        let model = PomodoroModel(workTimeInterval: 200, breakTimeInterval: 50, restTimeInterval: 20, numberOfCycles: 2)
         model.delegate = self
         
+        self.modelStarted = self.expectation(description: "model started")
         self.modelContinuedWork = self.expectation(description: "continueWork")
-        self.modelContinuedWork?.expectedFulfillmentCount = 2
         self.modeldidStartedBreak = self.expectation(description: "didStartBreak")
-        self.modeldidStartedBreak?.expectedFulfillmentCount = 1
         self.modelContinuedBreak = self.expectation(description: "continueBreak")
-        self.modelContinuedBreak?.expectedFulfillmentCount = 1
         self.modeldidStartedRest = self.expectation(description: "didStartRest")
-        self.modeldidStartedRest?.expectedFulfillmentCount = 1
         self.modelContinuedRest = self.expectation(description: "continueRest")
-        self.modelContinuedRest?.expectedFulfillmentCount = 1
-        self.modelContinuedRestHandler? = { (remainingSeconds: UInt) in
+        self.modelStopped = self.expectation(description: "stopped")
+        
+        self.modelStarted?.expectedFulfillmentCount = Int(modelStartedExpectedFulfillmentCount(cycles: UInt(model.numberOfCycles)))
+        self.modelContinuedWork?.expectedFulfillmentCount = Int(workExpectedFulfillmentCount(work: model.workTimeInterval, cycles: UInt(model.numberOfCycles)))
+        self.modeldidStartedBreak?.expectedFulfillmentCount = Int(breakCyclesEpcectedFulfillmentCount(cycles: UInt(model.numberOfCycles)))
+        self.modelContinuedBreak?.expectedFulfillmentCount = Int(breakExpectedFulfillmentCount(brake: model.breakTimeInterval, cycles: UInt(model.numberOfCycles)))
+        self.modeldidStartedRest?.expectedFulfillmentCount = Int(restCyclesEpcectedFulfillmentCount(cycles: UInt(model.numberOfCycles)))
+        self.modelContinuedRest?.expectedFulfillmentCount = Int(restExpectedFulfillmentCount(rest: model.restTimeInterval, cycles: UInt(model.numberOfCycles)))
+        
+        self.modelContinuedRestHandler = { (remainingSeconds: UInt) in
             if remainingSeconds == 1 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1 ) {
+                DispatchQueue.main.async{
                     model.stop()
                 }
             }
         }
         model.start()
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 1)
     }
 }
 
@@ -112,6 +118,7 @@ extension PomodoroModelTests: PomodoroModelDelegate {
     
     func continueWork(remaningSeconds: UInt) {
         self.modelContinuedWork?.fulfill()
+        modelContinuedWorkHandler?(remaningSeconds)
     }
     
     func didStartBreak(remaningSeconds: UInt) {
@@ -141,5 +148,36 @@ extension PomodoroModelTests: PomodoroModelDelegate {
     
     func didStopWork() {
         self.modelStopped?.fulfill()
+    }
+}
+
+func workExpectedFulfillmentCount(work: UInt, cycles: UInt) -> UInt {
+    let c = cycles + 1
+    let b = c * work - c
+    return b
+}
+
+func breakExpectedFulfillmentCount(brake: UInt, cycles: UInt) -> UInt {
+    let a = cycles * brake - cycles
+    return a
+}
+
+func restExpectedFulfillmentCount(rest: UInt, cycles: UInt) -> UInt {
+    return rest - 1
+}
+
+func breakCyclesEpcectedFulfillmentCount(cycles: UInt) -> UInt {
+    return cycles
+}
+
+func restCyclesEpcectedFulfillmentCount(cycles: UInt) -> UInt {
+    return 1
+}
+
+func modelStartedExpectedFulfillmentCount(cycles: UInt) -> UInt {
+    if cycles == 1 {
+        return 3
+    } else {
+        return cycles + 2
     }
 }

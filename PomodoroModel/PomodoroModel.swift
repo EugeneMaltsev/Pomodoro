@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol PomodoroModelDelegate: class {
+public protocol PomodoroModelDelegate: AnyObject {
     func didStartWork(partOfCompeletedCycle: UInt, remaningSeconds: UInt)
     func continueWork(remaningSeconds: UInt)
     func didStartBreak(remaningSeconds: UInt)
@@ -39,7 +39,7 @@ public class PomodoroModel {
         self.workTimeInterval = workTimeInterval
         self.breakTimeInterval = breakTimeInterval
         self.restTimeInterval = restTimeInterval
-        self.numberOfCycles = numberOfCycles
+        self.numberOfCycles = numberOfCycles // TODO: rename numberOfCycles with any suitable name
         self.state = StateNeutral()
         self.state.model = self
     }
@@ -59,7 +59,9 @@ public class PomodoroModel {
     public func resume() {
         state.resume()
     }
-    
+
+    static var TimerTicksPerSecond = 1
+
     // MARK: Private
     private var state: BaseState
     private var timer: Timer?
@@ -97,7 +99,8 @@ private extension PomodoroModel {
         
         func resume() {
             assert(self.underlyingTimer == nil)
-            self.underlyingTimer = UnderlyingTimer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            let timeInterval = 1.0 / Double(PomodoroModel.TimerTicksPerSecond)
+            self.underlyingTimer = UnderlyingTimer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { [weak self] _ in
                 self?.fireBlock?()
             }
         }
