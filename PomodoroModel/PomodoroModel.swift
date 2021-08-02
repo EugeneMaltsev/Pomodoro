@@ -8,12 +8,13 @@
 import Foundation
 
 public protocol PomodoroModelDelegate: AnyObject {
-    func didStartWork(partOfCompeletedCycle: UInt, remaningSeconds: UInt)
+    func didStartWork(remaningSeconds: UInt)
     func continueWork(remaningSeconds: UInt)
     func didStartBreak(remaningSeconds: UInt)
     func continueBreak(remaningSeconds: UInt)
     func didStartRest(remaningSeconds: UInt)
     func continueRest(remaningSeconds: UInt)
+    func didStartCycle(partOfCompeletedCycle: UInt)
     func didSuspendWork()
     func didResumeWork()
     func didStopWork()
@@ -170,7 +171,8 @@ private extension PomodoroModel {
                 self?.timerDidFire()
             }
             self.timer.resume()
-            model.delegate?.didStartWork(partOfCompeletedCycle: self.passedCycles, remaningSeconds: self.remaningSeconds)
+            model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
+            model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
         }
         
         override func stop() {
@@ -231,19 +233,21 @@ private extension PomodoroModel {
                 } else {
                     self.remaningSeconds = model.restTimeInterval
                     self.substate = .rest
-                    model.delegate?.didStartWork(partOfCompeletedCycle: self.passedCycles, remaningSeconds: self.remaningSeconds)
-
+                    model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
+                    model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
                     model.delegate?.didStartRest(remaningSeconds: self.remaningSeconds)
                 }
             case .interrupt:
                 self.remaningSeconds = model.workTimeInterval
                 self.substate = .working
-                model.delegate?.didStartWork(partOfCompeletedCycle: self.passedCycles, remaningSeconds: self.remaningSeconds)
+                model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
+                model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
             case .rest:
                 self.remaningSeconds = model.workTimeInterval
                 self.remaningCycles = model.numberOfCycles
                 self.substate = .working
-                model.delegate?.didStartWork(partOfCompeletedCycle: self.passedCycles, remaningSeconds: self.remaningSeconds)
+                model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
+                model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
             }
         }
     }

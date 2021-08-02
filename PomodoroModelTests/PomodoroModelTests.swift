@@ -20,6 +20,7 @@ class PomodoroModelTests: XCTestCase {
     var modelContinuedBreak: XCTestExpectation?
     var modeldidStartedBreak: XCTestExpectation?
     var modeldidStartedRest: XCTestExpectation?
+    var modeldidStartedCycle: XCTestExpectation?
     
     var modelContinuedWorkHandler: ((UInt) -> Void)?
     var modelContinuedRestHandler: ((UInt) -> Void)?
@@ -87,7 +88,7 @@ class PomodoroModelTests: XCTestCase {
         self.modelContinuedBreak = self.expectation(description: "continueBreak")
         self.modeldidStartedRest = self.expectation(description: "didStartRest")
         self.modelContinuedRest = self.expectation(description: "continueRest")
-        self.modelStopped = self.expectation(description: "stopped")
+        self.modelStopped = self.expectation(description: "model stopped")
         
         self.modelStarted?.expectedFulfillmentCount = Int(modelStartedExpectedFulfillmentCount(cycles: UInt(model.numberOfCycles)))
         self.modelContinuedWork?.expectedFulfillmentCount = Int(workExpectedFulfillmentCount(work: model.workTimeInterval, cycles: UInt(model.numberOfCycles)))
@@ -112,7 +113,7 @@ class PomodoroModelTests: XCTestCase {
 
 extension PomodoroModelTests: PomodoroModelDelegate {
     
-    func didStartWork(partOfCompeletedCycle: UInt, remaningSeconds: UInt) {
+    func didStartWork(remaningSeconds: UInt) {
         self.modelStarted?.fulfill()
     }
     
@@ -138,6 +139,10 @@ extension PomodoroModelTests: PomodoroModelDelegate {
         modelContinuedRestHandler?(remaningSeconds)
     }
     
+    func didStartCycle(partOfCompeletedCycle: UInt) {
+        self.modeldidStartedCycle?.fulfill()
+    }
+
     func didSuspendWork() {
         self.modelSuspended?.fulfill()
     }

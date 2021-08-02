@@ -9,6 +9,7 @@ import UIKit
 import PomodoroModel
 
 class ViewController: UIViewController, PomodoroModelDelegate {
+    
 // MARK: - ButtonOutlets
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
@@ -204,9 +205,8 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     }
     
     // MARK: - PomodoroModelDelegate
-    func didStartWork(partOfCompeletedCycle: UInt, remaningSeconds: UInt) {
+    func didStartWork(remaningSeconds: UInt) {
         updateRemainingTimeLabel(count: remaningSeconds, textColor: UIColor.red)
-        updateNumberOfCyclesLabel(cyclePart: partOfCompeletedCycle)
         didResumeWork()
     }
     
@@ -228,6 +228,10 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     
     func continueRest(remaningSeconds: UInt) {
         updateRemainingTimeLabel(count: remaningSeconds)
+    }
+    
+    func didStartCycle(partOfCompeletedCycle: UInt){
+        updateNumberOfCyclesLabel(cyclePart: partOfCompeletedCycle)
     }
     
     func didSuspendWork() {
@@ -257,7 +261,7 @@ class ViewController: UIViewController, PomodoroModelDelegate {
     private var workTimeInterval: PomodoroModel.TimeInterval = 1 //1500
     private var breakTimeInterval: PomodoroModel.TimeInterval = 1 // 700
     private var restTimeInterval: PomodoroModel.TimeInterval = 1// 300
-    private var numberOfCycles: Int = 1 // 4
+    private var numberOfCycles: Int = 2 // 4
     
     private func setupModel() {
         model = PomodoroModel(workTimeInterval: workTimeInterval, breakTimeInterval: breakTimeInterval, restTimeInterval: restTimeInterval, numberOfCycles: numberOfCycles)
