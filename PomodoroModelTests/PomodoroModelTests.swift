@@ -72,6 +72,8 @@ class PomodoroModelTests: XCTestCase {
         self.modelStopped = self.expectation(description: "model stopped")
         
         self.modelStarted?.expectedFulfillmentCount = Int(modelStartedExpectedFulfillmentCount(cycles: UInt(model.numberOfCycles)))
+        self.modelStarted?.expectedFulfillmentCount = model.startWorkFulfillmentCount
+
         self.modelContinuedWork?.expectedFulfillmentCount = Int(workExpectedFulfillmentCount(work: model.workTimeInterval, cycles: UInt(model.numberOfCycles)))
         self.modeldidStartedBreak?.expectedFulfillmentCount = Int(breakCyclesEpcectedFulfillmentCount(cycles: UInt(model.numberOfCycles)))
         self.modelContinuedBreak?.expectedFulfillmentCount = Int(breakExpectedFulfillmentCount(brake: model.breakTimeInterval, cycles: UInt(model.numberOfCycles)))
@@ -198,6 +200,29 @@ extension PomodoroModelTests: PomodoroModelDelegate {
     }
 }
 
+extension PomodoroModel {
+
+// TODO
+//    func didStartWork(remainingSeconds: UInt)
+//    func didStartBreak(remainingSeconds: UInt)
+//    func didStartRest(remainingSeconds: UInt)
+//    func didStartCycle(partOfCompeletedCycle: UInt)
+//    func continueWork(remainingSeconds: UInt)
+//    func continueBreak(remainingSeconds: UInt)
+//    func continueRest(remainingSeconds: UInt)
+//    func didSuspendWork()
+//    func didResumeWork()
+//    func didStopWork()
+
+    var startWorkFulfillmentCount: Int {
+        Int(workTimeInterval + restTimeInterval)
+    }
+
+    var startBreakFulfillmentCount: Int {
+
+    }
+}
+
 func workExpectedFulfillmentCount(work: UInt, cycles: UInt) -> UInt {
     let c = cycles + 1
     let b = c * work - c
@@ -221,7 +246,7 @@ func restCyclesEpcectedFulfillmentCount(cycles: UInt) -> UInt {
     return 1
 }
 
-func modelStartedExpectedFulfillmentCount(cycles: UInt) -> UInt {
+func modelStartedExpectedFulfillmentCount(cycles: UInt) -> Int {
     if cycles == 1 {
         return 3
     } else {
