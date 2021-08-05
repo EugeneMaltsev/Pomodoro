@@ -9,30 +9,40 @@ import XCTest
 @testable import PomodoroModel
 
 class PomodoroModelTests: XCTestCase {
-
+    
     var modelStarted: XCTestExpectation?
     var modelStopped: XCTestExpectation?
     var modelSuspended: XCTestExpectation?
     var modelResumed: XCTestExpectation?
     
-    var modelContinuedWork: XCTestExpectation?
-    var modelContinuedRest: XCTestExpectation?
-    var modelContinuedBreak: XCTestExpectation?
     var modeldidStartedBreak: XCTestExpectation?
     var modeldidStartedRest: XCTestExpectation?
     var modeldidStartedCycle: XCTestExpectation?
+    var modelContinuedWork: XCTestExpectation?
+    var modelContinuedRest: XCTestExpectation?
+    var modelContinuedBreak: XCTestExpectation?
     
     var modelContinuedWorkHandler: ((UInt) -> Void)?
+    var modelContinuedBreakHandler: ((UInt) -> Void)?
     var modelContinuedRestHandler: ((UInt) -> Void)?
-
+    
+    var modelDidStartWorkHandler: ((UInt) -> Void)?
+    var modelDidStartBreakHandler: ((UInt) -> Void)?
+    var modelDidStartRestHandler: ((UInt) -> Void)?
+    var modelDidStartCycleHandler: ((UInt) -> Void)?
+    
+    var modelSuspendHandler: (() -> Void)?
+    var modelResumeHandler: (() -> Void)?
+    var modelStopHandler: (() -> Void)?
+    
     override func setUpWithError() throws {
         PomodoroModel.TimerTicksPerSecond = 1000
     }
-
+    
     override func tearDownWithError() throws {
         PomodoroModel.TimerTicksPerSecond = 1
     }
-
+    
     func testDefaultCreation() throws {
         let model = PomodoroModel()
         XCTAssertEqual(model.workTimeInterval, 1500)
@@ -47,35 +57,6 @@ class PomodoroModelTests: XCTestCase {
         XCTAssertEqual(model.restTimeInterval, 500)
         XCTAssertEqual(model.breakTimeInterval, 200)
         XCTAssertEqual(model.numberOfCycles, 2)
-    }
-    
-    func testStartStop() {
-        let model = PomodoroModel(workTimeInterval: 10, breakTimeInterval: 2, restTimeInterval: 4, numberOfCycles: 2)
-        model.delegate = self
-        self.modelStarted = self.expectation(description: "model started")
-        self.modelStarted?.expectedFulfillmentCount = 1
-        self.modelStopped = self.expectation(description: "model stopped")
-        self.modelStopped?.expectedFulfillmentCount = 1
-        self.modelSuspended = self.expectation(description: "model suspended")
-        self.modelSuspended?.isInverted = true
-        self.modelResumed = self.expectation(description: "model resumed")
-        self.modelResumed?.isInverted = true
-        model.start()
-        Thread.sleep(forTimeInterval: 0.1)
-        model.stop()
-        self.waitForExpectations(timeout: 0)
-    //    self.wait(for expectations: [XCTestExpectation], timeout seconds: TimeInterval)
-    }
-    
-    func testStop() {
-        let model = PomodoroModel(workTimeInterval: 10, breakTimeInterval: 2, restTimeInterval: 4, numberOfCycles: 2)
-        model.delegate = self
-    
-        self.modelStarted = self.expectation(description: "model started")
-        self.modelStarted?.expectedFulfillmentCount = 1
-
-        model.start()
-        self.waitForExpectations(timeout: 0)
     }
     
     func testCompleteWay() {
@@ -107,52 +88,113 @@ class PomodoroModelTests: XCTestCase {
         model.start()
         waitForExpectations(timeout: 1)
     }
+    
+    func testStartStop() {
+        let model = PomodoroModel(workTimeInterval: 10, breakTimeInterval: 2, restTimeInterval: 4, numberOfCycles: 2)
+        model.delegate = self
+        
+        self.modelStopped = self.expectation(description: "model stopped")
+        self.modelStopped?.expectedFulfillmentCount = 1
+        
+        self.modelDidStartWorkHandler = { _ in
+            DispatchQueue.main.async{
+                model.stop()
+            }
+        }
+        model.start()
+        self.waitForExpectations(timeout: 0.1)
+    }
+    
+    func testStartSuspendStop() {
+        let model = PomodoroModel(workTimeInterval: 200, breakTimeInterval: 50, restTimeInterval: 20, numberOfCycles: 1)
+        model.delegate = self
+        
+        self.modelSuspended = self.expectation(description: "model suspended")
+        self.modelSuspended?.expectedFulfillmentCount = 1
+        
+        self.modelSuspendHandler = {
+            DispatchQueue.main.async{
+                model.stop()
+            }
+        }
+        model.start()
+        model.suspend()
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testStartSuspendResume() {
+        let model = PomodoroModel(workTimeInterval: 10, breakTimeInterval: 2, restTimeInterval: 4, numberOfCycles: 2)
+        model.delegate = self
+        
+        self.modelSuspended = self.expectation(description: "model suspended")
+        self.modelResumed = self.expectation(description: "model resumed")
+        self.modelSuspended?.expectedFulfillmentCount = 1
+        self.modelResumed?.expectedFulfillmentCount = 1
+        
+        self.modelResumeHandler = {
+            DispatchQueue.main.async{
+                model.stop()
+            }
+        }
+        model.start()
+        model.suspend()
+        model.resume()
+        waitForExpectations(timeout: 0.1)
+    }
 }
 
 // MARK: - PomodoroModelDelegate
 
 extension PomodoroModelTests: PomodoroModelDelegate {
     
-    func didStartWork(remaningSeconds: UInt) {
+    func didStartWork(remainingSeconds: UInt) {
         self.modelStarted?.fulfill()
+        modelDidStartWorkHandler?(remainingSeconds)
     }
     
-    func continueWork(remaningSeconds: UInt) {
-        self.modelContinuedWork?.fulfill()
-        modelContinuedWorkHandler?(remaningSeconds)
-    }
-    
-    func didStartBreak(remaningSeconds: UInt) {
+    func didStartBreak(remainingSeconds: UInt) {
         self.modeldidStartedBreak?.fulfill()
+        modelDidStartBreakHandler?(remainingSeconds)
     }
     
-    func continueBreak(remaningSeconds: UInt) {
-        self.modelContinuedBreak?.fulfill()
-    }
-    
-    func didStartRest(remaningSeconds: UInt) {
+    func didStartRest(remainingSeconds: UInt) {
         self.modeldidStartedRest?.fulfill()
-    }
-    
-    func continueRest(remaningSeconds: UInt) {
-        self.modelContinuedRest?.fulfill()
-        modelContinuedRestHandler?(remaningSeconds)
+        modelDidStartRestHandler?(remainingSeconds)
     }
     
     func didStartCycle(partOfCompeletedCycle: UInt) {
         self.modeldidStartedCycle?.fulfill()
+        modelDidStartCycleHandler?(partOfCompeletedCycle)
     }
-
+    
+    func continueWork(remainingSeconds: UInt) {
+        self.modelContinuedWork?.fulfill()
+        modelContinuedWorkHandler?(remainingSeconds)
+    }
+    
+    func continueBreak(remainingSeconds: UInt) {
+        self.modelContinuedBreak?.fulfill()
+        modelContinuedBreakHandler?(remainingSeconds)
+    }
+    
+    func continueRest(remainingSeconds: UInt) {
+        self.modelContinuedRest?.fulfill()
+        modelContinuedRestHandler?(remainingSeconds)
+    }
+    
     func didSuspendWork() {
         self.modelSuspended?.fulfill()
+        modelSuspendHandler?()
     }
     
     func didResumeWork() {
         self.modelResumed?.fulfill()
+        modelResumeHandler?()
     }
     
     func didStopWork() {
         self.modelStopped?.fulfill()
+        modelStopHandler?()
     }
 }
 

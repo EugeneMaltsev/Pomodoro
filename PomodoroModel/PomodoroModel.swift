@@ -8,13 +8,13 @@
 import Foundation
 
 public protocol PomodoroModelDelegate: AnyObject {
-    func didStartWork(remaningSeconds: UInt)
-    func continueWork(remaningSeconds: UInt)
-    func didStartBreak(remaningSeconds: UInt)
-    func continueBreak(remaningSeconds: UInt)
-    func didStartRest(remaningSeconds: UInt)
-    func continueRest(remaningSeconds: UInt)
+    func didStartWork(remainingSeconds: UInt)
+    func didStartBreak(remainingSeconds: UInt)
+    func didStartRest(remainingSeconds: UInt)
     func didStartCycle(partOfCompeletedCycle: UInt)
+    func continueWork(remainingSeconds: UInt)
+    func continueBreak(remainingSeconds: UInt)
+    func continueRest(remainingSeconds: UInt)
     func didSuspendWork()
     func didResumeWork()
     func didStopWork()
@@ -32,11 +32,11 @@ public class PomodoroModel {
     public let breakTimeInterval: TimeInterval
     public let restTimeInterval: TimeInterval
     public let numberOfCycles: Int
-
+    
     public init(workTimeInterval: TimeInterval = 1500,
-         breakTimeInterval: TimeInterval = 300,
-         restTimeInterval: TimeInterval = 700,
-         numberOfCycles: Int = 4) {
+                breakTimeInterval: TimeInterval = 300,
+                restTimeInterval: TimeInterval = 700,
+                numberOfCycles: Int = 4) {
         self.workTimeInterval = workTimeInterval
         self.breakTimeInterval = breakTimeInterval
         self.restTimeInterval = restTimeInterval
@@ -60,9 +60,9 @@ public class PomodoroModel {
     public func resume() {
         state.resume()
     }
-
+    
     static var TimerTicksPerSecond = 1
-
+    
     // MARK: Private
     private var state: BaseState
     private var timer: Timer?
@@ -165,14 +165,14 @@ private extension PomodoroModel {
         override func didEnter() {
             assert(self.substate == .working)
             guard let model = self.model else { return }
-            self.remaningSeconds = model.workTimeInterval
-            self.remaningCycles = model.numberOfCycles
+            self.remainingSeconds = model.workTimeInterval
+            self.remainingCycles = model.numberOfCycles
             self.timer.fireBlock = { [weak self] in
                 self?.timerDidFire()
             }
             self.timer.resume()
             model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
-            model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
+            model.delegate?.didStartWork(remainingSeconds: self.remainingSeconds)
         }
         
         override func stop() {
@@ -192,14 +192,14 @@ private extension PomodoroModel {
         }
         
         private var substate = Substate.working
-        private var remaningSeconds = UInt(0)
-        private var remaningCycles = Int(0)
+        private var remainingSeconds = UInt(0)
+        private var remainingCycles = Int(0)
         private var passedCycles = UInt(0)
-
+        
         private func timerDidFire() {
-            assert(self.remaningSeconds > 0)
-            self.remaningSeconds -= 1
-            if self.remaningSeconds > 0 {
+            assert(self.remainingSeconds > 0)
+            self.remainingSeconds -= 1
+            if self.remainingSeconds > 0 {
                 self.continueSubstate()
             } else {
                 self.switchToNextSubstate()
@@ -207,47 +207,47 @@ private extension PomodoroModel {
         }
         
         private func continueSubstate() {
-            assert(self.remaningSeconds > 0)
+            assert(self.remainingSeconds > 0)
             switch self.substate {
             case .working:
-                self.model?.delegate?.continueWork(remaningSeconds: self.remaningSeconds)
+                self.model?.delegate?.continueWork(remainingSeconds: self.remainingSeconds)
             case .interrupt:
-                self.model?.delegate?.continueBreak(remaningSeconds: self.remaningSeconds)
+                self.model?.delegate?.continueBreak(remainingSeconds: self.remainingSeconds)
             case .rest:
-                self.model?.delegate?.continueRest(remaningSeconds: self.remaningSeconds)
+                self.model?.delegate?.continueRest(remainingSeconds: self.remainingSeconds)
             }
         }
- 
+        
         private func switchToNextSubstate() {
-            assert(self.remaningSeconds == 0)
+            assert(self.remainingSeconds == 0)
             guard let model = self.model else { return }
             switch self.substate {
             case .working:
-                assert(self.remaningCycles >= 0)
-                self.remaningCycles -= 1
+                assert(self.remainingCycles >= 0)
+                self.remainingCycles -= 1
                 self.passedCycles += 1
-                if self.remaningCycles >= 0 {
-                    self.remaningSeconds = model.breakTimeInterval
+                if self.remainingCycles >= 0 {
+                    self.remainingSeconds = model.breakTimeInterval
                     self.substate = .interrupt
-                    model.delegate?.didStartBreak(remaningSeconds: self.remaningSeconds)
+                    model.delegate?.didStartBreak(remainingSeconds: self.remainingSeconds)
                 } else {
-                    self.remaningSeconds = model.restTimeInterval
+                    self.remainingSeconds = model.restTimeInterval
                     self.substate = .rest
                     model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
-                    model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
-                    model.delegate?.didStartRest(remaningSeconds: self.remaningSeconds)
+                    model.delegate?.didStartWork(remainingSeconds: self.remainingSeconds)
+                    model.delegate?.didStartRest(remainingSeconds: self.remainingSeconds)
                 }
             case .interrupt:
-                self.remaningSeconds = model.workTimeInterval
+                self.remainingSeconds = model.workTimeInterval
                 self.substate = .working
                 model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
-                model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
+                model.delegate?.didStartWork(remainingSeconds: self.remainingSeconds)
             case .rest:
-                self.remaningSeconds = model.workTimeInterval
-                self.remaningCycles = model.numberOfCycles
+                self.remainingSeconds = model.workTimeInterval
+                self.remainingCycles = model.numberOfCycles
                 self.substate = .working
                 model.delegate?.didStartCycle(partOfCompeletedCycle: self.passedCycles)
-                model.delegate?.didStartWork(remaningSeconds: self.remaningSeconds)
+                model.delegate?.didStartWork(remainingSeconds: self.remainingSeconds)
             }
         }
     }
